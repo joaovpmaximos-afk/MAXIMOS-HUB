@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAXIMOS Hub — Modo Teste (Excel)</title>
+
+<!-- Editor de planilha estilo Excel (x-spreadsheet, MIT) + SheetJS p/ exportar -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.9/dist/xspreadsheet.css">
+<script src="https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.9/dist/xspreadsheet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f1f5f9; --card:#ffffff; --tinta:#0f172a; --suave:#64748b;
+    --azul:#1d4ed8; --azul2:#1e40af; --azul3:#1e3a8a;
+    --borda:#e2e8f0; --ok:#16a34a; --perigo:#dc2626;
+    --sombra:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tinta);font-size:14px;overflow:hidden}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:14px}
+
+  .btn{padding:10px 15px;border:none;border-radius:9px;background:var(--azul);color:#fff;font-weight:600;transition:.15s}
+  .btn:hover{background:var(--azul2)}
+  .btn-sec{background:#fff;color:var(--tinta);border:1px solid var(--borda)}
+  .btn-sec:hover{background:#f8fafc}
+  .btn-perigo{background:var(--perigo)}
+  .campo{margin-bottom:14px}
+  .campo label{display:block;font-size:12px;font-weight:600;color:var(--suave);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+  .campo input{width:100%;padding:11px 12px;border:1px solid var(--borda);border-radius:9px;outline:none}
+  .campo input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(29,78,216,.12)}
+
+  header.topo{display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,var(--azul3),var(--azul2));color:#fff;padding:0 18px;height:56px}
+  .topo .marca{font-weight:800;font-size:19px;letter-spacing:.4px}
+  .topo .marca .hub{font-weight:500;opacity:.85}
+  .tag-teste{background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px;font-size:11px;letter-spacing:.5px;text-transform:uppercase}
+  .topo .espaco{flex:1}
+  .topo button.sair{background:rgba(255,255,255,.15);color:#fff;border:none;padding:7px 12px;border-radius:8px;font-size:13px}
+  .topo button.sair:hover{background:rgba(255,255,255,.28)}
+  .hamburguer{display:none;background:none;border:none;color:#fff;font-size:22px;padding:4px 8px}
+  .banner-teste{background:#fffbeb;color:#92400e;border-bottom:1px solid #fde68a;padding:7px 18px;font-size:12.5px;line-height:1.4}
+
+  .layout{display:flex;align-items:stretch;height:calc(100vh - 56px - 33px)}
+  aside.menu{width:230px;flex-shrink:0;background:#fff;border-right:1px solid var(--borda);padding:14px 10px;overflow:auto}
+  .menu .grupo-titulo{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--suave);font-weight:700;margin:14px 10px 6px}
+  .menu a.item{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:9px;color:var(--tinta);font-weight:500;margin-bottom:2px;cursor:pointer}
+  .menu a.item:hover{background:#f1f5f9}
+  .menu a.item.ativo{background:#eff6ff;color:var(--azul2);font-weight:600}
+  .menu a.item .ic{width:22px;text-align:center;font-size:16px}
+
+  main.conteudo{flex:1;padding:24px 28px;overflow:auto;min-width:0}
+  .cabecalho-pagina{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+  .cabecalho-pagina h1{margin:0;font-size:22px}
+  .cabecalho-pagina p{margin:4px 0 0;color:var(--suave);font-size:13px}
+  .cabecalho-pagina .acoes{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .breadcrumb{font-size:13px;color:var(--suave);margin-bottom:6px}
+  .breadcrumb a{color:var(--suave);cursor:pointer} .breadcrumb a:hover{color:var(--azul)}
+
+  .grade-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+  .card.dep{cursor:pointer;border:1px solid var(--borda);border-top:4px solid var(--azul);border-radius:12px;padding:18px;box-shadow:var(--sombra);transition:.15s;background:#fff}
+  .card.dep:hover{box-shadow:0 4px 14px rgba(15,23,42,.10);transform:translateY(-1px)}
+  .card .ic-grande{font-size:30px;margin-bottom:8px}
+  .card h3{margin:0 0 4px;font-size:16px}
+  .card .desc{color:var(--suave);font-size:13px;min-height:34px}
+  .card .meta{margin-top:12px}
+  .pill{background:#eff6ff;color:var(--azul2);font-weight:600;padding:3px 9px;border-radius:20px;font-size:12px}
+
+  .vazio{text-align:center;color:var(--suave);padding:50px 20px;background:#fff;border:1px dashed var(--borda);border-radius:12px}
+  .vazio .ic{font-size:40px;opacity:.5}
+
+  .lista-planilhas{display:flex;flex-direction:column;gap:10px}
+  .row-planilha{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--borda);border-radius:10px;padding:14px 16px;box-shadow:var(--sombra)}
+  .row-planilha .nome{font-weight:600;font-size:15px;cursor:pointer}
+  .row-planilha .nome:hover{color:var(--azul)}
+  .row-planilha .info{color:var(--suave);font-size:12px}
+  .row-planilha .dir{margin-left:auto;display:flex;gap:6px}
+  .icbtn{background:#fff;border:1px solid var(--borda);border-radius:8px;padding:6px 9px;font-size:13px}
+  .icbtn:hover{background:#f8fafc}
+  .icbtn.perigo:hover{background:#fef2f2;border-color:#fecaca;color:var(--perigo)}
+
+  /* área da grade (Excel) */
+  #grade-host{flex:1;min-width:0;display:none;flex-direction:column}
+  .sheet-top{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--borda);background:#fff}
+  .sheet-top .gnome{font-weight:700;font-size:15px}
+  .sheet-top .sep{flex:1}
+  .sheet-top .dica{color:var(--suave);font-size:12px}
+  #xss{flex:1;overflow:hidden}
+
+  #modal-fundo{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:60;align-items:center;justify-content:center;padding:20px}
+  #modal-fundo.aberto{display:flex}
+  .modal{background:#fff;border-radius:14px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+  .modal h2{margin:0;padding:20px 22px;border-bottom:1px solid var(--borda);font-size:18px}
+  .modal .corpo{padding:20px 22px}
+  .modal .rodape{padding:16px 22px;border-top:1px solid var(--borda);display:flex;justify-content:flex-end;gap:10px}
+
+  #toast-area{position:fixed;bottom:20px;right:20px;z-index:80;display:flex;flex-direction:column;gap:10px}
+  .toast{background:var(--tinta);color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:14px}
+  .toast.ok{background:var(--ok)} .toast.erro{background:var(--perigo)}
+
+  @media(max-width:900px){
+    .hamburguer{display:block}
+    aside.menu{position:fixed;top:89px;left:0;bottom:0;z-index:25;transform:translateX(-100%);transition:.2s;box-shadow:6px 0 18px rgba(0,0,0,.12)}
+    aside.menu.aberto{transform:none}
+    .tag-teste{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <button class="hamburguer" id="btn-menu">☰</button>
+  <div class="marca">MAXIMOS <span class="hub">Hub</span></div>
+  <span class="tag-teste">🧪 modo teste</span>
+  <div class="espaco"></div>
+  <button class="sair" id="btn-limpar">🗑 Limpar teste</button>
+</header>
+<div class="banner-teste">🧪 <b>Modo teste</b> — planilha estilo Excel: clique numa célula e digite. Fórmulas com <b>=</b> (ex.: <b>=A2*B2</b>, <b>=SUM(C2:C10)</b>). Tudo salvo só neste navegador.</div>
+
+<div class="layout">
+  <aside class="menu" id="menu-lateral"></aside>
+  <main class="conteudo" id="conteudo"></main>
+  <section id="grade-host">
+    <div class="sheet-top">
+      <button class="btn btn-sec" id="g-voltar">‹ Voltar</button>
+      <span class="gnome" id="g-nome"></span>
+      <span class="dica">— clique numa célula e digite (igual ao Excel)</span>
+      <span class="sep"></span>
+      <button class="btn btn-sec" id="g-export">⬇ Excel</button>
+      <button class="btn btn-sec" id="g-excluir" title="Excluir planilha">🗑</button>
+    </div>
+    <div id="xss"></div>
+  </section>
+</div>
+
+<div id="modal-fundo"><div class="modal" id="modal-box"></div></div>
+<div id="toast-area"></div>
+
+<script>
+/* ===== Helpers ===== */
+const $ = (s,e=document)=>e.querySelector(s);
+const $$ = (s,e=document)=>[...e.querySelectorAll(s)];
+const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(msg,tipo=''){ const t=document.createElement('div'); t.className='toast '+tipo; t.textContent=msg; $('#toast-area').appendChild(t); setTimeout(()=>t.remove(),3200); }
+function uid(){ return 'id-'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ===== Banco LOCAL (localStorage) ===== */
+const DB_KEY='maximoshub_teste_excel_v1';
+let BD=null;
+function salvar(){ try{ localStorage.setItem(DB_KEY, JSON.stringify(BD)); }catch(e){ toast('Não consegui salvar neste navegador.','erro'); } }
+function semear(){
+  const base=[
+    ['Fiscal','Apuração de impostos e obrigações fiscais','#2563eb','🧾'],
+    ['Contábil','Escrituração e demonstrações contábeis','#0891b2','📊'],
+    ['Departamento Pessoal','Folha, admissões e rotinas trabalhistas','#7c3aed','👥'],
+    ['Financeiro','Contas a pagar, a receber e fluxo de caixa','#16a34a','💰'],
+    ['Comercial','Clientes, propostas e vendas','#ea580c','🤝'],
+    ['TI','Sistemas, acessos e infraestrutura','#475569','💻'],
+  ];
+  BD={ departamentos: base.map((b,i)=>({id:uid(),nome:b[0],descricao:b[1],cor:b[2],icone:b[3],ordem:i+1})), planilhas:[], grids:{} };
+  salvar();
+}
+function iniciarDB(){ try{ BD=JSON.parse(localStorage.getItem(DB_KEY)); }catch(e){ BD=null; } if(!BD||!BD.departamentos){ semear(); } if(!BD.grids) BD.grids={}; }
+
+/* ===== Estado ===== */
+let departamentos=[], planilhas=[];
+let deptoAtual=null, planilhaAtual=null;
+let xs=null; // instância do editor de planilha
+
+function carregarBase(){
+  departamentos=[...BD.departamentos].sort((a,b)=>a.ordem-b.ordem);
+  planilhas=BD.planilhas.map(p=>({...p}));
+}
+function iniciar(){ iniciarDB(); carregarBase(); renderMenu(); irPara('inicio'); }
+
+/* ===== Menu / navegação ===== */
+function renderMenu(){
+  const m=$('#menu-lateral');
+  m.innerHTML = `<a class="item" data-rota="inicio"><span class="ic">🏠</span> Início</a>
+    <div class="grupo-titulo">Departamentos</div>` +
+    departamentos.map(d=>`<a class="item" data-rota="dep:${d.id}"><span class="ic">${d.icone||'📁'}</span> ${esc(d.nome)}</a>`).join('');
+  $$('#menu-lateral a.item').forEach(a=>a.addEventListener('click',()=>{
+    const r=a.dataset.rota;
+    if(r==='inicio') irPara('inicio'); else if(r.startsWith('dep:')) irPara('dep', r.slice(4));
+    $('#menu-lateral').classList.remove('aberto');
+  }));
+}
+function marcarMenu(rota){ $$('#menu-lateral a.item').forEach(a=>a.classList.toggle('ativo', a.dataset.rota===rota)); }
+function mostrarConteudo(){ $('#grade-host').style.display='none'; $('#conteudo').style.display=''; }
+function irPara(tela, arg){
+  if(tela==='inicio'){ mostrarConteudo(); marcarMenu('inicio'); telaInicio(); }
+  else if(tela==='dep'){ mostrarConteudo(); marcarMenu('dep:'+arg); telaDepartamento(arg); }
+  else if(tela==='planilha'){ abrirGrade(arg); }
+}
+
+/* ===== Início ===== */
+function telaInicio(){
+  const qtd = id => planilhas.filter(p=>p.departamento_id===id).length;
+  $('#conteudo').innerHTML = `
+    <div class="cabecalho-pagina"><div>
+      <h1>Suas planilhas, por departamento 👋</h1>
+      <p>Escolha um departamento e crie uma planilha. Ela abre como uma folha do Excel.</p>
+    </div></div>
+    <div class="grade-cards">${departamentos.map(d=>`
+      <div class="card dep" data-id="${d.id}" style="border-top-color:${d.cor||'#1d4ed8'}">
+        <div class="ic-grande">${d.icone||'📁'}</div>
+        <h3>${esc(d.nome)}</h3>
+        <div class="desc">${esc(d.descricao||'')}</div>
+        <div class="meta"><span class="pill">${qtd(d.id)} planilha(s)</span></div>
+      </div>`).join('')}</div>`;
+  $$('.card.dep').forEach(c=>c.addEventListener('click',()=>irPara('dep',c.dataset.id)));
+}
+
+/* ===== Departamento ===== */
+function telaDepartamento(id){
+  deptoAtual=departamentos.find(d=>d.id===id); if(!deptoAtual) return irPara('inicio');
+  const lista=planilhas.filter(p=>p.departamento_id===id);
+  $('#conteudo').innerHTML=`
+    <div class="breadcrumb"><a data-ir="inicio">Início</a> › ${esc(deptoAtual.nome)}</div>
+    <div class="cabecalho-pagina">
+      <div><h1>${deptoAtual.icone||'📁'} ${esc(deptoAtual.nome)}</h1><p>${esc(deptoAtual.descricao||'')}</p></div>
+      <div class="acoes"><button class="btn" id="nova-planilha">+ Nova planilha</button></div>
+    </div>
+    ${lista.length? `<div class="lista-planilhas">${lista.map(p=>`
+      <div class="row-planilha">
+        <div>
+          <div class="nome" data-abrir="${p.id}">📗 ${esc(p.nome)}</div>
+          <div class="info">${esc(p.descricao||'planilha')}</div>
+        </div>
+        <div class="dir">
+          <button class="icbtn" data-abrir="${p.id}">Abrir</button>
+          <button class="icbtn perigo" data-excluir="${p.id}">🗑</button>
+        </div>
+      </div>`).join('')}</div>`
+      : `<div class="vazio"><div class="ic">📗</div><p>Nenhuma planilha aqui ainda.<br>Clique em <b>+ Nova planilha</b> e comece a digitar.</p></div>`}`;
+  $$('[data-ir]').forEach(a=>a.addEventListener('click',()=>irPara(a.dataset.ir)));
+  $('#nova-planilha').addEventListener('click',()=>novaPlanilha(id));
+  $$('[data-abrir]').forEach(b=>b.addEventListener('click',()=>irPara('planilha',b.dataset.abrir)));
+  $$('[data-excluir]').forEach(b=>b.addEventListener('click',()=>excluirPlanilha(b.dataset.excluir)));
+}
+
+async function novaPlanilha(deptoId){
+  let nome='', desc='';
+  const ok=await modal({titulo:'Nova planilha', corpo:`
+    <div class="campo"><label>Nome da planilha</label><input id="np-nome" placeholder="Ex.: Contas a Pagar — Junho"></div>
+    <div class="campo"><label>Descrição (opcional)</label><input id="np-desc" placeholder="Breve descrição"></div>`,
+    confirmar:'Criar e abrir',
+    valida:()=>{ nome=$('#np-nome').value.trim(); desc=$('#np-desc').value.trim(); return nome?true:'Informe o nome.'; }});
+  if(!ok) return;
+  const p={id:uid(),departamento_id:deptoId,nome,descricao:desc};
+  BD.planilhas.push(p); BD.grids[p.id]=null; salvar();
+  planilhas.push({...p});
+  toast('Planilha criada.','ok');
+  irPara('planilha',p.id);
+}
+
+/* ===== Modal ===== */
+let _mres=null,_mval=null;
+function modal({titulo,corpo,confirmar='Confirmar',valida=null,perigo=false}){
+  return new Promise(res=>{
+    _mres=res; _mval=valida;
+    $('#modal-box').innerHTML=`<h2>${esc(titulo)}</h2><div class="corpo">${corpo}</div>
+      <div class="rodape"><button class="btn btn-sec" id="m-cancela">Cancelar</button>
+      <button class="btn ${perigo?'btn-perigo':''}" id="m-ok">${esc(confirmar)}</button></div>`;
+    $('#modal-fundo').classList.add('aberto');
+    $('#m-cancela').onclick=()=>fechar(false);
+    $('#m-ok').onclick=()=>{ if(_mval){ const v=_mval(); if(v!==true){ toast(typeof v==='string'?v:'Verifique os campos.','erro'); return; } } fechar(true); };
+  });
+}
+function fechar(v){ $('#modal-fundo').classList.remove('aberto'); const r=_mres; _mres=null; if(r) r(v); }
+$('#modal-fundo').addEventListener('click',e=>{ if(e.target.id==='modal-fundo') fechar(false); });
+async function confirmar(msg,txt='Excluir'){ return modal({titulo:'Confirmar', corpo:`<p style="margin:0;line-height:1.5">${esc(msg)}</p>`, confirmar:txt, perigo:true}); }
+
+/* ===== Abrir a GRADE (editor estilo Excel) ===== */
+function opcoesEditor(){
+  return {
+    mode:'edit', showToolbar:true, showGrid:true, showContextmenu:true,
+    view:{ height:()=>Math.max(340, window.innerHeight-230), width:()=>Math.max(560, $('#grade-host').clientWidth-2) },
+    row:{ len:200, height:25 },
+    col:{ len:26, width:110, indexWidth:56, minWidth:60 },
+  };
+}
+function abrirGrade(id){
+  const meta=planilhas.find(p=>p.id===id); if(!meta) return irPara('inicio');
+  if(typeof x_spreadsheet==='undefined'){ toast('O editor precisa de internet para carregar (1ª vez).','erro'); return; }
+  planilhaAtual=meta;
+  const dep=departamentos.find(d=>d.id===meta.departamento_id);
+  $('#conteudo').style.display='none';
+  $('#grade-host').style.display='flex';
+  $('#g-nome').textContent=(dep?dep.nome+'  ›  ':'')+meta.nome;
+  marcarMenu(dep?('dep:'+dep.id):'inicio');
+  const data=(BD.grids[id]&&BD.grids[id].length)? BD.grids[id] : [{name:meta.nome}];
+  if(!xs){
+    xs=x_spreadsheet($('#xss'), opcoesEditor());
+    xs.change(()=>{ if(planilhaAtual){ try{ BD.grids[planilhaAtual.id]=xs.getData(); salvar(); }catch(e){} } });
+  }
+  xs.loadData(data);
+}
+$('#g-voltar').addEventListener('click',()=>{ const dep=planilhaAtual&&departamentos.find(d=>d.id===planilhaAtual.departamento_id); irPara('dep', dep?dep.id:(deptoAtual&&deptoAtual.id)); });
+$('#g-excluir').addEventListener('click',()=>{ if(planilhaAtual) excluirPlanilha(planilhaAtual.id); });
+$('#g-export').addEventListener('click',exportarExcel);
+
+/* ===== Excluir planilha ===== */
+async function excluirPlanilha(id){
+  const p=planilhas.find(x=>x.id===id);
+  if(!await confirmar(`Excluir a planilha "${p?p.nome:''}" e todo o seu conteúdo?`)) return;
+  BD.planilhas=BD.planilhas.filter(x=>x.id!==id); delete BD.grids[id]; salvar();
+  planilhas=planilhas.filter(x=>x.id!==id);
+  toast('Planilha excluída.','ok');
+  irPara('dep', (p&&p.departamento_id)||(deptoAtual&&deptoAtual.id));
+}
+
+/* ===== Exportar a planilha aberta para Excel ===== */
+function exportarExcel(){
+  if(!xs){ toast('Abra uma planilha primeiro.','erro'); return; }
+  if(typeof XLSX==='undefined'){ toast('Biblioteca de Excel indisponível (precisa de internet).','erro'); return; }
+  try{
+    const all=xs.getData(); const sheet=Array.isArray(all)?all[0]:all;
+    const rows=(sheet&&sheet.rows)||{}; const aoa=[];
+    let maxR=0; Object.keys(rows).forEach(k=>{ if(/^\d+$/.test(k)) maxR=Math.max(maxR, Number(k)+1); });
+    for(let r=0;r<maxR;r++){ const row=rows[r]; const arr=[]; if(row&&row.cells){ let maxC=0; Object.keys(row.cells).forEach(k=>maxC=Math.max(maxC,Number(k)+1)); for(let c=0;c<maxC;c++){ arr.push(row.cells[c]? (row.cells[c].text||''):''); } } aoa.push(arr); }
+    while(aoa.length && aoa[aoa.length-1].every(v=>v==='')) aoa.pop();
+    const ws=XLSX.utils.aoa_to_sheet(aoa.length?aoa:[['']]);
+    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,(planilhaAtual.nome||'Planilha').slice(0,28));
+    XLSX.writeFile(wb, (planilhaAtual.nome||'planilha').replace(/[\\/:*?"<>|]/g,'-')+'.xlsx');
+    toast('Excel gerado.','ok');
+  }catch(e){ toast('Não consegui exportar agora.','erro'); }
+}
+
+/* ===== Limpar / menu / start ===== */
+async function limparTeste(){
+  if(!await confirmar('Apagar TODAS as planilhas de teste deste navegador e recomeçar?','Apagar tudo')) return;
+  localStorage.removeItem(DB_KEY); xs=null; $('#xss').innerHTML=''; iniciarDB(); carregarBase(); renderMenu(); irPara('inicio'); toast('Tudo limpo.','ok');
+}
+$('#btn-limpar').addEventListener('click',limparTeste);
+$('#btn-menu').addEventListener('click',()=>$('#menu-lateral').classList.toggle('aberto'));
+
+iniciar();
+</script>
+</body>
+</html>
